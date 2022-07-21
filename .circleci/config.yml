@@ -1,0 +1,68 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+commands:
+  npm:
+    description: "writing the command would've been faster."
+    parameters:
+      param:
+        type: string
+    steps:
+      - run: npm run <<parameters.param>>
+  npm_install:
+    description: "installs the needed packages"
+    steps:
+      - run: npm i
+executors:
+  node-executor:
+    docker:
+      - image: circleci/node:13.8.0
+jobs:
+  build_app:
+    description: "download needed packages then build app"
+    executor: node-executor
+    steps:
+      - checkout
+      - npm_install
+      - save_cache:
+          key: "npm-packages"
+          paths:
+            - /src/node_modules
+      - npm:
+          param: "lint"
+  test_app:
+    description: "tests the app to see if it runs"
+    executor: node-executor
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - "npm-packages"
+      - npm_install
+      - npm:
+          param: "test"
+
+  analyze_app:
+    description: "analyzses the app, post runtime"
+    executor: node-executor
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - "npm_packages"
+      - npm_install
+      - npm:
+          param:  "audit"
+      - run: 
+          name: "probable audit failure"
+          command: "Job failed successfully!"
+workflows:
+  continous_integration_example:
+      jobs:
+      - build_app
+      - test_app:
+          requires: 
+            - build_app
+      - analyze_app:
+          requires: 
+            - test_app
