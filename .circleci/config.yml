@@ -49,7 +49,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - "npm_packages"
+            - "npm-packages"
       - npm_install
       - npm:
           param:  "audit"
