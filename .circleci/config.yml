@@ -60,10 +60,3 @@ jobs:
 workflows:
   continous_integration_example:
       jobs:
-      - build_app
-      - test_app:
-          requires: 
-            - build_app
-      - analyze_app:
-          requires: 
-            - test_app
