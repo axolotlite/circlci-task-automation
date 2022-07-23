@@ -56,6 +56,7 @@ jobs:
       - run: 
           name: "probable audit failure"
           command: "Job failed successfully!"
+          when: on_fail
 workflows:
   continous_integration_example:
       jobs:
